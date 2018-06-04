@@ -90,7 +90,7 @@ class ConnectionPool:
 
 class AbstractProductAPI(object):
     def __init__(self, access_key, secret_key, protocol='http'):
-        self.host = 'osc.speedycloud.net'
+        self.host = 'oss-cn-beijing.speedycloud.org'
         self.access_key = access_key
         self.secret_key = secret_key
         self.protocol = protocol
