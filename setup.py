@@ -3,7 +3,6 @@ import sys
 
 packages = [
     'speedycloud',
-    'speedycloud.products',
     'speedycloud.object_storage',
 ]
 

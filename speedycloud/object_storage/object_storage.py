@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from speedycloud.object_storage import AbstractProductAPI
 from lxml import etree
 import urllib
@@ -205,7 +206,7 @@ class ObjectStorageAPI(AbstractProductAPI):
             ".//{http://s3.amazonaws.com/doc/2006-03-01/}UploadId").text
         return upload_id
 
-    def upload_big_data_two(self, bucket, key, update_data, update_type, part_number, upload_id):
+    def upload_big_data_two(self, bucket, key, update_data, part_number, upload_id):
         '''
         上传大数据第二步
         参数:
@@ -217,10 +218,7 @@ class ObjectStorageAPI(AbstractProductAPI):
             upload_id: 上传大数据第一步返回的uploadID
         注意：将返回的etag保存，在大数据上传第三步使用
         '''
-        if update_type == 'file':
-            update_content = open(str(update_data), 'rb').read()
-        elif update_type == 'string':
-            update_content = update_data
+        update_content = update_data
         path = self._get_path('%s/%s?partNumber=%s&uploadId=%s' % (
             bucket, key, int(part_number), str(upload_id)))
         request, header = self.upload_big_data_put(path, update_content)
@@ -250,3 +248,27 @@ class ObjectStorageAPI(AbstractProductAPI):
         elif update_type == 'string':
             update_content = update_data
         return self.post(path, update_content)
+
+    def upload_big_data(self, bucket, key, update_data, update_type, params):
+        uid = self.upload_big_data_one(bucket, key)
+        f = open(update_data)
+        length = os.path.getsize(update_data)
+        if length > 5 * 1024 * 1024 * 1024:
+            print "file is bigger than 5G"
+            return
+        i = length / (1024 * 1024 * 20)
+        j = length % 1024 * 1024 * 20
+        if j != 0:
+            i += 1
+        s = ""
+        for k in range(i):
+            if k != i - 1:
+                etag = self.upload_big_data_two(bucket, key, f.read(1024 * 1024 * 20), k + 1, uid)
+            else:
+                etag = self.upload_big_data_two(bucket, key, f.read(length - k * 1024 * 1024 * 20),
+                                                k + 1, uid)
+            s += '<Part><PartNumber>%s</PartNumber><ETag>%s</ETag></Part>' % (k + 1, etag)
+        f.close()
+        s = '<CompleteMultipartUpload>' + s + '</CompleteMultipartUpload>'
+        path = self._get_path('%s/%s?uploadId=%s' % (bucket, key, uid))
+        return self.post(path, data=s, params=params)
