@@ -192,7 +192,7 @@ class ObjectStorageAPI(AbstractProductAPI):
             update_content = update_data
         return self.put(path, update_content, params=header_params)
 
-    def upload_big_data_one(self, bucket, key):
+    def upload_big_data_one(self, bucket, key, params={}):
         '''
         上传大数据第一步
         参数:
@@ -200,7 +200,7 @@ class ObjectStorageAPI(AbstractProductAPI):
             key: 对象名
         '''
         path = self._get_path('%s/%s?uploads' % (bucket, key))
-        xml = self.post(path)
+        xml = self.post(path, params=params)
         root = etree.fromstring(xml)
         upload_id = root.find(
             ".//{http://s3.amazonaws.com/doc/2006-03-01/}UploadId").text
@@ -250,7 +250,7 @@ class ObjectStorageAPI(AbstractProductAPI):
         return self.post(path, update_content)
 
     def upload_big_data(self, bucket, key, update_data, update_type, params):
-        uid = self.upload_big_data_one(bucket, key)
+        uid = self.upload_big_data_one(bucket, key, params)
         f = open(update_data)
         length = os.path.getsize(update_data)
         if length > 5 * 1024 * 1024 * 1024:
