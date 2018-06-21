@@ -13,14 +13,14 @@ class ObjectStorageAPI(AbstractProductAPI):
     def _get_path(self, suffix):
         return "%s%s" % (self.BASE_PATH, suffix)
 
-    def list(self, bucket):
+    def list(self, bucket, prefix=""):
         """
         查询桶内对象列表
         参数:
             bucket: 桶名
         注意： bucket参数为''时，可查看所有桶
         """
-        path = self._get_path('%s' % bucket)
+        path = self._get_path('%s?prefix=%s' % (bucket, prefix))
         return self.get(path)
 
     def create_bucket(self, bucket):

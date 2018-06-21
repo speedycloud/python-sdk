@@ -107,6 +107,8 @@ class AbstractProductAPI(object):
         return urllib.urlencode(params)
 
     def _generate_headers(self, method, path, params):
+        if "?prefix" in path:
+            path = path.split("?prefix")[0]
         request_date = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
         sign = self.create_sign(method, path, params)
         authorization = "AWS" + " " + str(self.access_key) + ":" + sign
