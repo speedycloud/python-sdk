@@ -15,6 +15,9 @@ SECRET_KEY = "YOUR-SECRET-KEY"
 oss_api = speedycloud.create_object_storage_api(ACCESS_KEY, SECRET_KEY)
 
 # 获取 bucket 列表
+print oss_api.get_services()
+
+# 获取 object 列表
 print oss_api.list(BUCKET)
 
 # 创建 bucket

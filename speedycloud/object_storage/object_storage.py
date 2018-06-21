@@ -23,6 +23,14 @@ class ObjectStorageAPI(AbstractProductAPI):
         path = self._get_path('%s?prefix=%s' % (bucket, prefix))
         return self.get(path)
 
+    def get_services(self):
+        """
+        获取桶列表
+        :return: 桶列表
+        """
+        path = self._get_path("")
+        return self.get(path)
+
     def create_bucket(self, bucket):
         """
         创建存储桶

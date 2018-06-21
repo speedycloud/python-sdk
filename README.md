@@ -21,7 +21,7 @@ SDK 版本 |  Python 版本
 
 ## 使用方法
 
-## 获取桶列表
+## 获取桶内对象列表
 
 ```python
 import speedycloud
