@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+
 import urllib
 import httplib
-from datetime import datetime
 import hmac
 import hashlib
 import socket
 import time
 import threading
 import base64
+from datetime import datetime
 
 
 class ProductAPIError(Exception):
@@ -74,7 +75,8 @@ class ConnectionPool:
                     cleaned -= 1
                     self.size -= 1
 
-    def reconnect(self, connection):
+    @staticmethod
+    def reconnect(connection):
         connection.close()
 
     @classmethod
@@ -98,7 +100,8 @@ class AbstractProductAPI(object):
         self.pool = ConnectionPool.get_instance(
             self.host, protocol)
 
-    def _encode_params(self, params):
+    @staticmethod
+    def _encode_params(params):
         if params is None:
             return ''
         return urllib.urlencode(params)
@@ -136,7 +139,8 @@ class AbstractProductAPI(object):
         sign = hmac.new(self.secret_key, sign_str, digestmod=hashlib.sha1)
         return base64.b64encode(sign.digest())
 
-    def create_sign_str(self, **params):
+    @staticmethod
+    def create_sign_str(**params):
         http_header_date = str(
             datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
         )
@@ -191,17 +195,27 @@ class AbstractProductAPI(object):
         finally:
             self.pool.put_connection(connection)
 
-    def post(self, path, data=None, params={}):
+    def post(self, path, data=None, params=None):
+        if params is None:
+            params = {}
         return self.request('POST', path, data, params)
 
-    def get(self, path, data=None, params={}):
+    def get(self, path, data=None, params=None):
+        if params is None:
+            params = {}
         return self.request('GET', path, data, params)
 
-    def put(self, path, data=None, params={}):
+    def put(self, path, data=None, params=None):
+        if params is None:
+            params = {}
         return self.request('PUT', path, data, params)
 
-    def upload_big_data_put(self, path, data=None, params={}):
+    def upload_big_data_put(self, path, data=None, params=None):
+        if params is None:
+            params = {}
         return self.request('PUT', path, data, params), self.response_header
 
-    def delete(self, path, data=None, params={}):
+    def delete(self, path, data=None, params=None):
+        if params is None:
+            params = {}
         return self.request('DELETE', path, data, params)
